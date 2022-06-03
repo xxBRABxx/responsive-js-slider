@@ -1,10 +1,11 @@
 
-// define slider
+// define slider (you can define several sliders on page according to this structure)
 if (document.querySelector("#s1-slider-wrap")) {
 	const mySlider = document.querySelector("#s1-slider-wrap");
     arrowSlider(mySlider)
 }
 
+// slider logic
 function arrowSlider(sliderWrap) {
 	const slider = sliderWrap.querySelector("#slider");
 	const sliderCounterWrap = sliderWrap.querySelector("#slider-counter-wrap");
