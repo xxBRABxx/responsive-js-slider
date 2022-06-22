@@ -8,59 +8,46 @@ if (document.querySelector("#s1-slider-wrap")) {
 // slider logic
 function arrowSlider(sliderWrap) {
 	const slider = sliderWrap.querySelector("#slider");
-	const sliderCounterWrap = sliderWrap.querySelector("#slider-counter-wrap");
     const sliderElements = sliderWrap.querySelectorAll(".slider-item")  
-    const prewArrow = sliderWrap.querySelector(".slider-arrows-prew");
-	const nextArrow = sliderWrap.querySelector(".slider-arrows-next");
-
-	const sliderWrapWidth = sliderWrap.offsetWidth;       
-	const sliderWidth = slider.offsetWidth;
-	const sliderElWidth = sliderElements[0].offsetWidth + 15; //15 is margin
-	const totalSlidersCount = Math.floor(sliderWidth/sliderElWidth)
-	let slidersCount = Math.floor(sliderWrapWidth/sliderElWidth)
-	let overlay = false; // overlay check
-
-	sliderCounterWrap.innerHTML = "<strong>" + slidersCount + "</strong> | " + totalSlidersCount;
+    const prewArrow = sliderWrap.querySelector("#slider-arrow-prew");
+	const nextArrow = sliderWrap.querySelector("#slider-arrow-next");
+    const initialLeftPos = parseInt(window.getComputedStyle(slider).getPropertyValue("left").split("px")[0]);
+    const elMargin = parseInt(window.getComputedStyle(sliderElements[0]).getPropertyValue("margin-right").split("px")[0]);
+	const sliderElWidth = sliderElements[0].offsetWidth + elMargin;
+	const totalSlidersCount = sliderElements.length
+	let slidersCount = 0;
 
 	nextArrow.addEventListener("click", () => { showNext() });
 	prewArrow.addEventListener("click", () => { showPrew() });
 
+	// logic for touchpad
 	let touchstartX = 0;
 	let touchendX = 0;
 	slider.addEventListener('touchstart', e => { touchstartX = e.changedTouches[0].screenX })
 	slider.addEventListener('touchend', e => { 
 		touchendX = e.changedTouches[0].screenX;
-		touchendX < touchstartX ? showNext() : showPrew()
+		touchendX < touchstartX ? showNext() : showPrew();
 	});
 
+	// main functions
 	function showNext() {
-		let leftPos = slider.style.left;	
-		leftPos == "" ? leftPos = 0 : leftPos = leftPos.split("px")[0];
-		if (leftPos != 0 && parseInt(leftPos.split("-")[1]) + sliderWrapWidth > sliderWidth) {
-			//console.log("At the End")
+		if (slidersCount == totalSlidersCount - 1) {
+			// console.log("On End")
 		} else {
-			slider.style.left = leftPos - sliderElWidth + "px";
-			if (slidersCount < totalSlidersCount) {
-				slidersCount++;
-				sliderCounterWrap.innerHTML = "<strong>" + slidersCount + "</strong> | " + totalSlidersCount;
-			} else {
-				overlay = true 
-			}
+            slidersCount++
+			slider.style.left = initialLeftPos - sliderElWidth * slidersCount + "px";
+            sliderElements.forEach(el => el.classList.remove("active"))
+            sliderElements[slidersCount].classList.toggle("active")	
 		}
 	};
 	function showPrew() {
-		let leftPos = slider.style.left;
-		if (leftPos == "" || leftPos == "0px") {
-			//console.log("On Start")
+        if (slidersCount == 0) {
+			// console.log("On Start")
 		} else {
-			leftPos = leftPos.split("px")[0]
-			slider.style.left = parseInt(leftPos) + sliderElWidth + "px";
-			if (!overlay) {
-				slidersCount--
-				sliderCounterWrap.innerHTML = "<strong>" + slidersCount + "</strong> | " + totalSlidersCount;	
-			} else {
-				overlay = false
-			}
+			slidersCount--;
+			slider.style.left = initialLeftPos - sliderElWidth * slidersCount + "px";
+            sliderElements.forEach(el => el.classList.remove("active"));
+            sliderElements[slidersCount].classList.toggle("active")
 		}
 	}
 }
